@@ -1,6 +1,7 @@
 use std::{
     fs::{read_dir, File},
-    path::{Path, PathBuf}, io::Read,
+    io::Read,
+    path::{Path, PathBuf},
 };
 
 use crate::{Error, FFResult};
@@ -107,7 +108,6 @@ pub fn decompress_lz4(p: impl AsRef<Path>) -> FFResult<Vec<u8>> {
     Ok(lz4_flex::decompress_size_prepended(&buf[8..])?)
 }
 
-
 #[cfg(test)]
 mod test {
     use std::{path::PathBuf, str::FromStr};
@@ -116,13 +116,11 @@ mod test {
 
     #[test]
     fn list_recovery() {
-        let files: Vec<_> =list_recovery_files_inner("assets/test")
-            .unwrap()
-            .collect();
-        let expected = ["assets/test/.mozilla/firefox/5w5airb6.default-release/sessionstore-backups/recovery.jsonlz4"]; 
-        let fullmatch = files.iter()
-            .zip(&expected)
-            .all(|(listed, expected)| listed.as_ref().unwrap() == &PathBuf::from_str(expected).unwrap());
+        let files: Vec<_> = list_recovery_files_inner("assets/test").unwrap().collect();
+        let expected = ["assets/test/.mozilla/firefox/5w5airb6.default-release/sessionstore-backups/recovery.jsonlz4"];
+        let fullmatch = files.iter().zip(&expected).all(|(listed, expected)| {
+            listed.as_ref().unwrap() == &PathBuf::from_str(expected).unwrap()
+        });
         eprintln!("expected:{expected:?}");
         eprintln!("files:{files:?}");
         assert!(fullmatch);

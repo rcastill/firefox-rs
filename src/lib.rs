@@ -1,6 +1,6 @@
 mod util;
 
-use std::{env::temp_dir, fs::File, process::{Command}, io::Write};
+use std::{env::temp_dir, fs::File, io::Write, process::Command};
 
 use lz4_flex::block::DecompressError;
 use util::{decompress_lz4, list_recovery_files};
@@ -92,14 +92,12 @@ impl Tab {
             </script></body></html>",
             self.url
         );
-        let path= temp_dir().join("firefox-rs-focus.html");
+        let path = temp_dir().join("firefox-rs-focus.html");
         let mut f = File::create(&path)?;
         f.write_all(hack.as_bytes())?;
-        let mut child = Command::new("firefox")
-            .arg(path)
-            .spawn()?;
+        let mut child = Command::new("firefox").arg(path).spawn()?;
         if !child.wait()?.success() {
-            return Err(Error::ExitStatus)
+            return Err(Error::ExitStatus);
         }
         Ok(())
     }

@@ -1,6 +1,6 @@
 use std::io::{stdin, BufRead};
 
-use firefox_rs::{list_tabs};
+use firefox_rs::list_tabs;
 
 fn main() -> anyhow::Result<()> {
     let mut tabs = list_tabs()?;
@@ -21,7 +21,7 @@ fn main() -> anyhow::Result<()> {
                 let title = &tab.title;
                 eprintln!("Focusing {title}");
                 tab.focus()?;
-                return Ok(())
+                return Ok(());
             }
         }
         let hi = tabs.len() - 1;
