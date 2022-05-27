@@ -1,24 +1,29 @@
 mod util;
 
-
 use lz4_flex::block::DecompressError;
 use util::{decompress_lz4, list_recovery_files};
 
+/// Crate global errors
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
+    /// Firefox data folder or needed files inside are not accessible
     #[error("Firefox data dir not found: {0}")]
     FFDirNotFound(&'static str),
+    /// Std IO error
     #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
+    /// Failure to decompress lz4; e.g. recovery.json
     #[error("lz4 error: {0}")]
     Lz4Decompression(#[from] DecompressError),
+    /// Json ser/de error
     #[error("json error: {0}")]
     Json(#[from] serde_json::Error),
+    /// Composed error; e.g. if list_tabs() failed trying multiple recovery files
     #[error("multiple errors: {0}")]
     Multi(String),
 }
 
-// Firefox Result
+/// Firefox Result
 pub type FFResult<T> = Result<T, Error>;
 
 mod recovery {
@@ -53,24 +58,34 @@ mod recovery {
     }
 }
 
+/// Firefox tab representation
 #[derive(Debug)]
 pub struct Tab {
-    title: String,
-    url: String,
+    /// Tab's title
+    pub title: String,
+    /// Tab's url
+    pub url: String,
 }
 
-impl From<recovery::Entry>  for  Tab {
+impl From<recovery::Entry> for Tab {
     fn from(e: recovery::Entry) -> Self {
-        Tab{title:e.title,url:e.url}
+        Tab {
+            title: e.title,
+            url: e.url,
+        }
     }
 }
 
 impl Tab {
+    /// Try to focus this tab using hack.
+    ///
+    /// Firefox extension: [focusTab](https://addons.mozilla.org/en-US/firefox/addon/focus_tab/) is required
     pub fn focus(&self) -> FFResult<()> {
         todo!()
     }
 }
 
+/// Returns list of tabs in open firefox instance
 pub fn list_tabs() -> FFResult<Vec<Tab>> {
     let mut errors = Vec::with_capacity(0);
     // in case of multi error; add errors accumulated in iterations to error vec
@@ -101,7 +116,7 @@ pub fn list_tabs() -> FFResult<Vec<Tab>> {
             .flat_map(|window| window.tabs.into_iter().map(recovery::Tab::into_entry))
             .map(Tab::from)
             .collect();
-        return Ok(tabs)
+        return Ok(tabs);
     }
 
     // TODO: is this really necessary? are there more than one "recovery.json" to worry about?
@@ -114,7 +129,7 @@ pub fn list_tabs() -> FFResult<Vec<Tab>> {
                 errors_s += &format!("({i}) {e} ");
             }
             errors_s
-        }))
+        })),
     }
 }
 
