@@ -1,5 +1,7 @@
 mod util;
 
+use std::{env::temp_dir, fs::File, process::{Command}, io::Write};
+
 use lz4_flex::block::DecompressError;
 use util::{decompress_lz4, list_recovery_files};
 
@@ -13,14 +15,16 @@ pub enum Error {
     #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
     /// Failure to decompress lz4; e.g. recovery.json
-    #[error("lz4 error: {0}")]
+    #[error("LZ4 error: {0}")]
     Lz4Decompression(#[from] DecompressError),
     /// Json ser/de error
-    #[error("json error: {0}")]
+    #[error("JSON error: {0}")]
     Json(#[from] serde_json::Error),
     /// Composed error; e.g. if list_tabs() failed trying multiple recovery files
-    #[error("multiple errors: {0}")]
+    #[error("Multiple errors: {0}")]
     Multi(String),
+    #[error("Subcommand failed")]
+    ExitStatus,
 }
 
 /// Firefox Result
@@ -81,7 +85,23 @@ impl Tab {
     ///
     /// Firefox extension: [focusTab](https://addons.mozilla.org/en-US/firefox/addon/focus_tab/) is required
     pub fn focus(&self) -> FFResult<()> {
-        todo!()
+        let hack = format!(
+            "<!DOCTYPE html><body>\
+            <script>window.focusTab({{url:'{}'}});\
+            open(location, '_self').close();\
+            </script></body></html>",
+            self.url
+        );
+        let path= temp_dir().join("firefox-rs-focus.html");
+        let mut f = File::create(&path)?;
+        f.write_all(hack.as_bytes())?;
+        let mut child = Command::new("firefox")
+            .arg(path)
+            .spawn()?;
+        if !child.wait()?.success() {
+            return Err(Error::ExitStatus)
+        }
+        Ok(())
     }
 }
 
