@@ -2,3 +2,4 @@
 /Cargo.lock
 /venv/
 /.vscode/
+/run.sh
