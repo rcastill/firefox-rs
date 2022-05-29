@@ -59,6 +59,7 @@ mod recovery {
     pub struct Entry {
         pub title: String,
         pub url: String,
+        pub image: Option<String>,
     }
 }
 
@@ -69,6 +70,8 @@ pub struct Tab {
     pub title: String,
     /// Tab's url
     pub url: String,
+    /// Tab's icon
+    pub icon: Option<String>,
 }
 
 impl From<recovery::Entry> for Tab {
@@ -76,6 +79,7 @@ impl From<recovery::Entry> for Tab {
         Tab {
             title: e.title,
             url: e.url,
+            icon: e.image,
         }
     }
 }
