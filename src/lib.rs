@@ -47,6 +47,7 @@ mod recovery {
     pub struct Tab {
         entries: Vec<Entry>,
         index: usize,
+        pub image: Option<String>,
     }
 
     impl Tab {
@@ -59,7 +60,6 @@ mod recovery {
     pub struct Entry {
         pub title: String,
         pub url: String,
-        pub image: Option<String>,
     }
 }
 
@@ -74,13 +74,11 @@ pub struct Tab {
     pub icon: Option<String>,
 }
 
-impl From<recovery::Entry> for Tab {
-    fn from(e: recovery::Entry) -> Self {
-        Tab {
-            title: e.title,
-            url: e.url,
-            icon: e.image,
-        }
+impl From<recovery::Tab> for Tab {
+    fn from(mut t: recovery::Tab) -> Self {
+        let icon = t.image.take();
+        let recovery::Entry { title, url } = t.into_entry();
+        Tab { title, url, icon }
     }
 }
 
@@ -135,7 +133,7 @@ pub fn list_tabs() -> FFResult<Vec<Tab>> {
         let tabs = topl
             .windows
             .into_iter()
-            .flat_map(|window| window.tabs.into_iter().map(recovery::Tab::into_entry))
+            .flat_map(|window| window.tabs)
             .map(Tab::from)
             .collect();
         return Ok(tabs);
