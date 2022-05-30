@@ -2,6 +2,9 @@
 name = "firefox-rs"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+description = "Firefox browser un-official interface"
+repository = "https://github.com/rcastill/firefox-rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
