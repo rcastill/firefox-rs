@@ -2,6 +2,11 @@
 
 Library to interface with firefox. Hacks are allowed.
 
+## How to use?
+
+- See `examples`
+- Also, look into [firefox-tabs](https://github.com/rcastill/pop-launcher-firefox-tabs/) pop launcher plugin
+
 ## Development Notes
 
 - To implement `focus_tab`, user must install [`focusTab`](https://addons.mozilla.org/en-US/firefox/addon/focus_tab/)
