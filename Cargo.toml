@@ -5,6 +5,10 @@ edition = "2021"
 license = "MIT"
 description = "Firefox browser un-official interface"
 repository = "https://github.com/rcastill/firefox-rs"
+exclude = [
+    "assets",
+    "scripts"
+]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
